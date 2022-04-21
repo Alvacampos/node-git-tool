@@ -5,10 +5,13 @@ const octokit = new Octokit({
   auth: process.env.OCTOKIT_TOKE,
 });
 
+const projectFilter = (list, input) =>
+  list.filter((file) => file.name.match(input));
+
 const displayProjects = async (projectData) => {
   process.stdout.write("Projects:\n");
 
-  projectData.data.forEach((project) => {
+  projectData.forEach((project) => {
     process.stdout.write(
       `${project.name}, ${project.body}. ID: ${project.id}.\n`
     );
@@ -35,18 +38,22 @@ const displayTasks = async () => {
   }
 };
 
-const fetchProjectData = async () => {
+const fetchProjectData = async (input) => {
   let fetchProjectsData;
   try {
-    fetchProjectsData = await octokit.request("GET /orgs/{owner}/projects", {
-      owner: "moove-it",
-    });
+    fetchProjectsData = await octokit.request(
+      "GET /repos/{owner}/{repo}/projects",
+      {
+        owner: "Alvacampos",
+        repo: "apprenticeship",
+      }
+    );
   } catch (e) {
     console.log(e);
     process.exitCode = 0;
   }
-  console.log(fetchProjectsData);
-  //displayProjects(fetchProjectsData);
+
+  displayProjects(projectFilter(fetchProjectsData.data, input));
 };
 
 const handShake = async () => {

@@ -1,11 +1,18 @@
 import { handShake, fetchProjectData, displayTasks } from "./utils.js";
 
-process.stdout.write("Sending request\n");
+let input;
+try {
+  input = new RegExp(`${process.argv[2]}$`);
+} catch (e) {
+  console.log("Invalid Input", e);
+  process.exitCode = 0;
+}
 
 (function getGitData() {
-  //handShake();
-  fetchProjectData();
-  displayTasks();
+  handShake();
+  process.stdout.write(`Sending request... searching for ${input}\n`);
+  fetchProjectData(input);
+  //displayTasks();
 })();
 
 process.exitCode = 0;
