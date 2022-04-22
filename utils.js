@@ -9,8 +9,8 @@ const projectFilter = (list, input) =>
   list.filter((file) => file.name.match(input));
 
 const requestHandler = (url, options) => {
-  return octokit.request(url, options)
-}
+  return octokit.request(url, options);
+};
 const displayData = (projectData, cardsData) => {
   process.stdout.write("Project:\n");
 
@@ -30,19 +30,20 @@ const displayData = (projectData, cardsData) => {
   });
 };
 
-
 const getProjectData = async (input) => {
   try {
     const projectData = await requestHandler("GET /orgs/moove-it/projects");
 
     const filteredProject = projectFilter(projectData.data, input);
 
-    const fetchColumnCards = await requestHandler('GET /projects/columns/{column_id}/cards', {
-      column_id: 2393577
-    });
+    const fetchColumnCards = await requestHandler(
+      "GET /projects/columns/{column_id}/cards",
+      {
+        column_id: 2393577,
+      }
+    );
 
     displayData(filteredProject, fetchColumnCards.data);
-
   } catch (e) {
     console.log(e);
     process.exitCode = 0;

@@ -12,7 +12,6 @@ try {
   handShake();
   process.stdout.write(`Sending request... searching for ${input}\n`);
   getProjectData(input);
-
 })();
 
 process.exitCode = 0;
