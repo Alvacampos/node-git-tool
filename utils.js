@@ -8,52 +8,45 @@ const octokit = new Octokit({
 const projectFilter = (list, input) =>
   list.filter((file) => file.name.match(input));
 
-const displayProjects = async (projectData) => {
-  process.stdout.write("Projects:\n");
+const requestHandler = (url, options) => {
+  return octokit.request(url, options)
+}
+const displayData = (projectData, cardsData) => {
+  process.stdout.write("Project:\n");
 
   projectData.forEach((project) => {
     process.stdout.write(
       `${project.name}, ${project.body}. ID: ${project.id}.\n`
     );
   });
+
+  process.stdout.write("Tasks:\n");
+
+  cardsData.forEach((card) => {
+    process.stdout.write(
+      ` \nTask: ${card.id}.
+      \n${card.note}.`
+    );
+  });
 };
 
-const displayTasks = async () => {
-  try {
-    const fetchProjectsData = await octokit.request(
-      "GET /projects/{id}/columns’",
-      {
-        id: "1373142",
-        mediaType: {
-          previews: ["inertia"],
-        },
-      }
-    );
 
-    console.log(fetchProjectsData);
-    // console.log(JSON.stringify(fetchData.data[0].owner));
+const getProjectData = async (input) => {
+  try {
+    const projectData = await requestHandler("GET /orgs/moove-it/projects");
+
+    const filteredProject = projectFilter(projectData.data, input);
+
+    const fetchColumnCards = await requestHandler('GET /projects/columns/{column_id}/cards', {
+      column_id: 2393577
+    });
+
+    displayData(filteredProject, fetchColumnCards.data);
+
   } catch (e) {
     console.log(e);
     process.exitCode = 0;
   }
-};
-
-const fetchProjectData = async (input) => {
-  let fetchProjectsData;
-  try {
-    fetchProjectsData = await octokit.request(
-      "GET /repos/{owner}/{repo}/projects",
-      {
-        owner: "Alvacampos",
-        repo: "apprenticeship",
-      }
-    );
-  } catch (e) {
-    console.log(e);
-    process.exitCode = 0;
-  }
-
-  displayProjects(projectFilter(fetchProjectsData.data, input));
 };
 
 const handShake = async () => {
@@ -65,8 +58,9 @@ const handShake = async () => {
     console.log("Hello, %s", login);
   } catch (e) {
     console.log(e);
+
     process.exitCode = 0;
   }
 };
 
-export { displayTasks, fetchProjectData, handShake };
+export { getProjectData, handShake };
